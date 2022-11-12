@@ -36,7 +36,8 @@ router.post('/posts', async function (req, res) {
   ];
   await db.query('INSERT INTO posts (title, summary, body, author_id) VALUES (?)',[
     data
-  ]);
+  ]
+  );
   // '?' place holder that will be replaced by the array '[data]'
   // the package mysql will automatically spread out into separated values
   res.redirect('/posts');
