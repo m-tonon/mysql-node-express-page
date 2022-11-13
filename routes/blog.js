@@ -60,7 +60,19 @@ router.get('/posts/:id', async function(req,res){
     return res.status(404).render('404'); // with the return the next line wont be executed
   }
 
-  res.render('post-detail', { post: posts[0] }); // the second paramenter exposes the post const
+  const postData = {
+    ...posts[0], // take all the key-pair values and spread out into this new object
+    date: posts[0].date.toISOString(), // transform the date to a string
+    humanReadableDate: posts[0].date.toLocaleDateString('en-US',{
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }) 
+    //transform the date into a string that is readable to humans
+  }
+
+  res.render('post-detail', { post: postData }); // the second paramenter exposes the post const
 });
 
 module.exports = router;
