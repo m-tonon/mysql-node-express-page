@@ -12,7 +12,7 @@ router.get('/posts', async function (req, res) {
   const query = `
   SELECT posts.*, authors.name AS author_name from posts 
   INNER JOIN authors ON posts.author_id = authors.id
-  `; // for more readability
+  `; // using `` for more readability
   const [posts] = await db.query(query);
   res.render('posts-list', { posts: posts });
 });
@@ -35,12 +35,32 @@ router.post('/posts', async function (req, res) {
     req.body.author,
   ];
   await db.query('INSERT INTO posts (title, summary, body, author_id) VALUES (?)',[
-    data
+    data // here all the values that want to insert on (?): title, summary, content & author
   ]
   );
   // '?' place holder that will be replaced by the array '[data]'
   // the package mysql will automatically spread out into separated values
   res.redirect('/posts');
+});
+
+router.get('/posts/:id', async function(req,res){
+  const query = `
+  SELECT posts.*, authors.name AS author_name, authors.email AS author_email FROM posts 
+  INNER JOIN authors ON posts.author_id = authors.id
+  WHERE posts.id = ?
+  `;
+
+  const [posts] = await db.query(query, [req.params.id]); 
+  // thats how extract the concreat value of the id place holder
+  // from the path for which this router was loaded - e.g localhost/posts/1 path
+  // created automatically on browser replacing '?'
+
+  // to hande if manually type the id and there's no matching post
+  if (!posts || posts.length === 0) {
+    return res.status(404).render('404'); // with the return the next line wont be executed
+  }
+
+  res.render('post-detail', { post: posts[0] }); // the second paramenter exposes the post const
 });
 
 module.exports = router;
